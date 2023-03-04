@@ -11,3 +11,8 @@ sudo apt-get update & sudo apt-get upgrade
 ```
 ### Docker
 #### 安装
+```
+wget https://raw.githubusersontent.com/xvmvx/new/main/docker.sh
+chmod +x docker.sh
+sudo ./docker.sh
+```
