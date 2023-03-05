@@ -6,7 +6,7 @@ wget -O box.sh https://raw.githubusercontent.com/BlueSkyXN/SKY-BOX/main/box.sh &
 ```
 ### 国内脚本1
 ```
-wget -O docker_install.sh https://raw.githubusercontent.com/rnmrnmrn/m/main/docker_install.sh && chmod +xdocker_install.sh && clear && ./docker_install.sh
+wget -O docker_install.sh https://raw.githubusercontent.com/rnmrnmrn/m/main/docker_install.sh && chmod +x docker_install.sh && clear && ./docker_install.sh
 ```
 ### Debian
 #### 系统升级
