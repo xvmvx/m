@@ -47,6 +47,13 @@ docker run --restart always \
 ## PBX
 ## 开发
 ## 网络
+### 内网穿透
+#### PPTP
+```
+wget https://raw.githubusercontent.com/saaiful/PPTP-VPN/master/install.sh
+chmod +x install.sh
+sudo bash install.sh
+```
 ### 短网址
 #### Porl
 ```
