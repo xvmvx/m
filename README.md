@@ -29,7 +29,10 @@ sudo systemctl restart docker
 ```
 #### Fast OS Docker
 ```
-
+docker run --restart always \
+--name fastosdocker -p 1081:8081 -p 8082:8082 \
+-d -v /var/run/docker.sock:/var/run/docker.sock -e TZ="Asia/Shanghai" \
+-v /etc/docker/:/etc/docker/ wangbinxingkong/fast
 ```
 #### Po
 ```
