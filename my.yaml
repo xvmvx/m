@@ -1,0 +1,260 @@
+version: '3'
+services:
+  app:
+    image: 'jc21/nginx-proxy-manager:latest'
+    restart: unless-stopped
+    ports:
+      - '80:80'  # 冒号左边可以改成自己服务器未被占用的端口
+      - '81:81'  # 冒号左边可以改成自己服务器未被占用的端口
+      - '443:443' # 冒号左边可以改成自己服务器未被占用的端口
+    volumes:
+      - ./data:/data # 冒号左边可以改路径
+      - ./letsencrypt:/etc/letsencrypt  
+      
+  flare:
+    image: soulteary/flare
+    restart: always
+    # 默认无需添加任何参数，如有特殊需求
+    # 可阅读文档 https://github.com/soulteary/docker-flare/blob/main/docs/advanced-startup.md
+    # 启用账号登录模式
+    command: flare
+    command: flare --nologin=0
+    environment:
+      # 如需开启用户登录模式，需要先设置 `nologin` 启动参数为 `0`
+      # 如开启 `nologin`，未设置 FLARE_USER，则默认用户为 `flare`
+      - FLARE_USER=goodway
+      # 指定你自己的账号密码，如未设置 `FLARE_USER`，则会默认生成密码并展示在应>用启动日志中
+      - FLARE_PASS=Guwei888
+      - FLARE_GUIDE=1
+    ports:
+      - 3000:5005
+    volumes:
+      - ./app:/app
+      
+  trilium-cn:
+    image: nriver/trilium-cn
+    restart: always
+    ports:
+      - "3001:8080"
+    volumes:
+      # 把同文件夹下的 trilium-data 目录映射到容器内
+      - ./trilium-data:/root/trilium-data
+    environment:
+      # 环境变量表示容器内笔记数据的存储路径
+      - TRILIUM_DATA_DIR=/root/trilium-data
+      
+  wikijs:
+    image: lscr.io/linuxserver/wikijs
+    container_name: wikijs
+    environment:
+      - PUID=1000        # 如何查看当前用户的PUID和PGID，直接命令行输入id就行
+      - PGID=1000
+      - TZ=Asia/Shanghai
+    volumes:
+      - ./wikijs/config:/config  # 配置文件映射到本地，数据不会因为Docker停止而>丢失
+      - ./wikijs/data:/data  # 数据映射到本地，数据不会因为Docker停止而丢失
+    ports:
+      - 3002:3000   # 左边的8080可以自己调整端口号，右边的3000不要改
+    restart: unless-stopped
+      
+  zookeeper:
+    image: zookeeper:3.7.0
+    container_name: zookeeper
+    restart: unless-stopped
+    volumes:
+      - "./zookeeper/data:/data"
+      - "./zookeeper/datalog:/datalog"
+    ports:
+      - "3003:2181"
+
+  # 可视化界面
+
+  zookeeper-webui:
+    image: tobilg/zookeeper-webui
+    container_name: zookeeper-webui
+    restart: unless-stopped
+    environment:
+      ZK_DEFAULT_NODE: zookeeper:2181
+    depends_on:
+      - zookeeper
+    links:
+      - zookeeper
+    ports:
+      - "3004:8080"
+      
+      
+    vocechat:
+        restart: always
+        ports:
+            - '3005:3000'  # 冒号左边可以改成自己服务器未被占用的端口
+        container_name: vocechat-server
+        volumes:
+            - './vocechat:/home/vocechat-server/data' # 冒号左边可以改路径
+        image: privoce/vocechat-server:latest
+      
+  portainer:
+    image: jpomdocker/jpom
+    container_name: jpom-server # 容器名为'jpom-server'
+    restart: unless-stopped     # 指定容器退出后的重启策略为始终重启，
+    volumes:                    # 数据卷挂载路径设置,将本机目录映射到容器目录
+      - "./jpom/logs:/usr/local/jpom-server/logs"
+      - "./jpom/data:/usr/local/jpom-server/data"
+      - "./jpom/conf:/usr/local/jpom-server/conf"
+    environment:                        # 设置环境变量,相当于docker run命令中的-e
+      TZ: Asia/Shanghai
+      LANG: en_US.UTF-8
+    ports:                              # 映射端口
+      - "3006:2122"
+      
+  answer:
+    image: answerdev/answer
+    ports:
+      - '3007:80'
+    restart: on-failure
+    volumes:
+      - ./answer-data:/data
+  db1:
+    image: mariadb:10
+    command: --character-set-server=utf8mb4 --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: answer   # 数据库用户root的密码，建议自行修改一个
+      MYSQL_USER: answer
+      MYSQL_PASSWORD: answer   # 数据库用户answer的密码，建议自行修改一个
+      MYSQL_DATABASE: answer
+    volumes:
+      - ./mariadb:/var/lib/mysql  # 冒号左边可以改路径
+    restart: on-failure
+      
+      
+      
+  db:
+    image: mysql:8.0
+    command:
+      - --default_authentication_plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci     
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+      
+  wordpress:
+    depends_on:
+      - db
+    image: wordpress:latest
+    ports:
+      - "3:80"
+    restart: always
+    environment:
+      WORDPRESS_DB_HOST: db:3306
+      WORDPRESS_DB_USER: wordpress
+      WORDPRESS_DB_PASSWORD: wordpress
+volumes:
+  db_data:
+version: '2'
+
+
+  freepbx-app:
+    container_name: freepbx-app
+    image: tiredofit/freepbx
+    ports:
+     #### 如果您不使用反向代理
+      - 580:80
+     #### 如果你想要 SSL 支持而不是使用反向代理
+     #- 443:443
+      - 55060:5060/udp
+      - 55160:5160/udp
+      - 18000-18100:18000-18100/udp
+     #### 闪存操作面板
+      - 54445:4445
+    volumes:
+      - ./certs:/certs
+      - ./data:/data
+      - ./logs:/var/log
+      - ./data/www:/var/www/html
+     ### 仅当您设置DB_Embedded=TRUE时才启用下面的此选项
+     #- ./db:/var/lib/mysql
+     ### 您可以删除自定义文件上方的图像，如果您已经修改了模块/css/whatever-小心使用
+     #- ./assets/custom:/assets/custom
+
+    environment:
+      - VIRTUAL_HOST=hostname.example.com
+      - VIRTUAL_NETWORK=nginx-proxy
+     ### 如果你想连接到 SSL Enabled Container
+     #- VIRTUAL_PORT=443
+     #- VIRTUAL_PROTO=https
+      - VIRTUAL_PORT=580
+
+      - ZABBIX_HOSTNAME=freepbx-app
+
+      - RTP_START=18000
+      - RTP_FINISH=18100
+
+     ## 用于外部 MySQL 服务器
+      - DB_EMBEDDED=FALSE
+
+     ### 只有在 DB_EMBEDDED=FALSE 时才需要这些
+      - DB_HOST=freepbx-db
+      - DB_PORT=53306
+      - DB_NAME=asterisk
+      - DB_USER=asterisk
+      - DB_PASS=asteriskpass
+
+     ### 如果您使用 Apache 的 TLS 支持来侦听容器中的 443，请将它们放入 /certs 并设置这些：
+     #- TLS_CERT=cert.pem
+     #- TLS_KEY=key.pem
+
+    restart: always
+    networks:
+      - proxy-tier
+
+    ### 最后几行是Fail2ban。 如果不想，ENABLE_FAIL2BAN=FALSE 添加到您的环境中
+    cap_add:
+      - NET_ADMIN
+    privileged: true
+
+  freepbx-db:
+    container_name: freepbx-db
+    image: tiredofit/mariadb
+    restart: always
+    volumes:
+      - ./db:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+      - MYSQL_DATABASE=asterisk
+      - MYSQL_USER=asterisk
+      - MYSQL_PASSWORD=asteriskpass
+    networks:
+      - proxy-tier
+
+  freepbx-db-backup:
+    container_name: freepbx-db-backup
+    image: tiredofit/db-backup
+    links:
+     - freepbx-db
+    volumes:
+      - ./dbbackup:/backup
+    environment:
+      - ZABBIX_HOSTNAME=freepbx-db-backup
+      - DB_HOST=freepbx-db
+      - DB_TYPE=mariadb
+      - DB_NAME=asterisk
+      - DB_USER=asterisk
+      - DB_PASS=asteriskpass
+      - DB_DUMP_FREQ=1440
+      - DB_DUMP_BEGIN=0000
+      - DB_CLEANUP_TIME=8640
+      - COMPRESSION=BZ
+      - MD5=TRUE
+    networks:
+      - proxy-tier
+    restart: always
+
+networks:
+  proxy-tier:
+    external:
+      name: nginx-proxy
