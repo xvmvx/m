@@ -60,6 +60,32 @@ wget https://raw.githubusercontent.com/saaiful/PPTP-VPN/master/install.sh
 chmod +x install.sh
 sudo bash install.sh
 ```
+
+
+#### VPN
+```
+git clone --depth=1 https://github.com/bedefaced/vpn-install.git
+```
+##### pptp
+默认情况下使用 172.16.0.0/24（可修改 pptpd.conf.dist 和 env.sh）。
+```
+vpn-install/pptp/install.sh
+```
+##### openvpn
+```
+vpn-install/openvpn/install.sh
+```
+##### ipsec
+```
+vpn-install/ipsec/install.sh
+```
+#### 卸载
+在安装过程中，脚本将备份系统中的配置文件，并将创建卸载脚本。所以使用一些（在根下或使用sudo）：
+```
+vpn-install/pptp/uninstall/uninstall.sh
+vpn-install/openvpn/uninstall/uninstall.sh
+vpn-install/ipsec/uninstall/uninstall.sh
+```
 ### 短网址
 #### Porl
 ```
