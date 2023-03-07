@@ -15,6 +15,11 @@ sudo apt-get update & sudo apt-get upgrade
 ```
 ### Docker
 #### 安装
+##### 国内
+```
+wget -O docker_install.sh https://raw.githubusercontent.com/rnmrnmrn/m/main/docker_install.sh && chmod +x docker_install.sh && clear && ./docker_install.sh
+```
+##### 国外
 ```
 wget https://raw.githubusersontent.com/xvmvx/new/main/docker.sh
 chmod +x docker.sh
