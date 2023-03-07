@@ -54,29 +54,7 @@ docker run -d -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock -v porta
 ## 开发
 ## 网络
 ### 内网穿透
-#### PPTP
-```
-wget https://raw.githubusercontent.com/saaiful/PPTP-VPN/master/install.sh
-chmod +x install.sh
-sudo bash install.sh
-```
-
-#### centos6_pptp_sh
-```
-git clone https://github.com/longtengdidu/centos6_pptp_sh.git
-chmod +x centos6_pptp_sh
-./centos6_pptp_sh
-```
-##### 如果遇到807或者619错误，运行以下命令
-```
-iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 1723 -j ACCEPT
-iptables -A INPUT -m state --state NEW -m udp -p udp --dport 1723 -j ACCEPT
-iptables -I INPUT -p tcp --dport 1723 -j ACCEPT
-iptables -I INPUT -p udp --dport 1723 -j ACCEPT
-/etc/init.d/iptables save
-/etc/init.d/iptables restart
-```
-#### VPN
+#### VPN 3合1
 ```
 git clone --depth=1 https://github.com/bedefaced/vpn-install.git
 ```
@@ -100,6 +78,38 @@ vpn-install/pptp/uninstall/uninstall.sh
 vpn-install/openvpn/uninstall/uninstall.sh
 vpn-install/ipsec/uninstall/uninstall.sh
 ```
+#### PPTP 4个
+##### 一键脚本
+```
+wget https://raw.githubusercontent.com/saaiful/PPTP-VPN/master/install.sh
+chmod +x install.sh
+sudo bash install.sh
+```
+
+##### entos6一键脚本
+```
+git clone https://github.com/longtengdidu/centos6_pptp_sh.git
+chmod +x centos6_pptp_sh
+./centos6_pptp_sh
+```
+######  如果遇到807或者619错误，运行以下命令
+```
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 1723 -j ACCEPT
+iptables -A INPUT -m state --state NEW -m udp -p udp --dport 1723 -j ACCEPT
+iptables -I INPUT -p tcp --dport 1723 -j ACCEPT
+iptables -I INPUT -p udp --dport 1723 -j ACCEPT
+/etc/init.d/iptables save
+/etc/init.d/iptables restart
+```
+
+##### ccentos6带添加用户的一键脚本
+```
+wget https://raw.githubusercontent.com/xvmvx/m/main/vpn_centos6.sh
+chmod +x vpn_centos6.sh
+./vpn_centos6.sh
+```
+
+
 ### 短网址
 #### Porl
 ```
