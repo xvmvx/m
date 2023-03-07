@@ -61,7 +61,21 @@ chmod +x install.sh
 sudo bash install.sh
 ```
 
-
+#### centos6_pptp_sh
+```
+git clone https://github.com/longtengdidu/centos6_pptp_sh.git
+chmod +x centos6_pptp_sh
+./centos6_pptp_sh
+```
+##### 如果遇到807或者619错误，运行以下命令
+```
+iptables -A INPUT -m state --state NEW -m tcp -p tcp --dport 1723 -j ACCEPT
+iptables -A INPUT -m state --state NEW -m udp -p udp --dport 1723 -j ACCEPT
+iptables -I INPUT -p tcp --dport 1723 -j ACCEPT
+iptables -I INPUT -p udp --dport 1723 -j ACCEPT
+/etc/init.d/iptables save
+/etc/init.d/iptables restart
+```
 #### VPN
 ```
 git clone --depth=1 https://github.com/bedefaced/vpn-install.git
@@ -79,7 +93,7 @@ vpn-install/openvpn/install.sh
 ```
 vpn-install/ipsec/install.sh
 ```
-#### 卸载
+##### 卸载
 在安装过程中，脚本将备份系统中的配置文件，并将创建卸载脚本。所以使用一些（在根下或使用sudo）：
 ```
 vpn-install/pptp/uninstall/uninstall.sh
